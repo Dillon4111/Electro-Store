@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "542769030917",
+    "project_id": "electrostore-97bdc",
+    "storage_bucket": "electrostore-97bdc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542769030917:android:26c67e76cc52b41261b96c",
+        "android_client_info": {
+          "package_name": "com.example.electrostore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "542769030917-14bfd924l7adv9u2d14936l7egblpc7k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.electrostore",
+            "certificate_hash": "6ab7db942f4501a5eb287d63f0b0d41e24ab85b5"
+          }
+        },
+        {
+          "client_id": "542769030917-7c7g662m5j3hod9b1gl2v4nq6asu2t48.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlYohGxzt39qLwchIZvYF7DE3lbzKoU7w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "542769030917-7c7g662m5j3hod9b1gl2v4nq6asu2t48.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

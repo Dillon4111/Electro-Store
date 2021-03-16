@@ -78,8 +78,8 @@ public class SignInActivity extends AppCompatActivity {
                                         Toast.makeText(SignInActivity.this, "User signed in",
                                                 Toast.LENGTH_SHORT).show();
 
-//                                                Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-//                                                startActivity(intent);
+                                                Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                                                startActivity(intent);
 
                                     } else {
                                         Log.w("MySignin", "SignInUserWithEmail:failure", task.getException());

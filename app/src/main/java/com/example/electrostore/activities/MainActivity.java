@@ -9,22 +9,54 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.electrostore.R;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private DrawerLayout drawerLayout;
+    private EditText searchTitleEdit, searchCatEdit, searchManuEdit;
+    private Spinner sortSpinner;
+    private List<String> sortSpinnerList = new ArrayList<>();
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+
+    private boolean isAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        checkIfAdmin();
+
+        searchTitleEdit = findViewById(R.id.nameSearch);
+        searchCatEdit = findViewById(R.id.categorySearch);
+        searchManuEdit = findViewById(R.id.manufactSearch);
+        sortSpinner = findViewById(R.id.sortSpinner);
+
+        //sortSpinnerList.add("Sort");
+        sortSpinnerList.add("Ascending");
+        sortSpinnerList.add("Descending");
 
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -51,10 +83,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         Intent i;
         switch (id) {
-//            case R.id.nav_my_watchlist:
-//                i = new Intent(MainActivity.this, MyWatchlistActivity.class);
-//                startActivity(i);
-//                break;
+            case R.id.nav_add_product:
+                if(isAdmin) {
+                    i = new Intent(MainActivity.this, AddProductActivity.class);
+                    startActivity(i);
+                }
+                else {
+                    Toast.makeText(MainActivity.this, "Admin needed for access",
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
 //            case R.id.nav_search_movie:
 //                i = new Intent(MainActivity.this, SearchActivity.class);
 //                startActivity(i);
@@ -85,4 +123,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public void checkIfAdmin() {
+        DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
+        userDB.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if(mUser.getUid().equals(snapshot.getKey())) {
+                        String admin = snapshot.child("admin").getValue().toString();
+
+                        if(admin.equals("true")) {
+                            isAdmin = true;
+                        }
+                        else
+                            isAdmin = false;
+
+                        Log.d("Admin = ", String.valueOf(isAdmin));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 }

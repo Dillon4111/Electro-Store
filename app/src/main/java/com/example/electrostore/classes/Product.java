@@ -3,19 +3,23 @@ package com.example.electrostore.classes;
 public class Product {
 
     private String id, name, category, description, manufacturer, image;
-    private double price;
+    private double price, overallRating;
+    private int totalRatings, stockLevel;
 
     public Product() {
     }
 
     public Product(String name, String category, String description,
-                   String manufacturer, String image, double price) {
+                   String manufacturer, String image, double price, int stockLevel) {
         this.name = name;
         this.category = category;
         this.description = description;
         this.manufacturer = manufacturer;
         this.image = image;
         this.price = price;
+        this.overallRating = 0;
+        this.totalRatings = 0;
+        this.stockLevel = stockLevel;
     }
 
     public String getId() {
@@ -72,5 +76,29 @@ public class Product {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public double getOverallRating() {
+        return overallRating;
+    }
+
+    public void setOverallRating(double overallRating) {
+        this.overallRating = overallRating;
+    }
+
+    public int getTotalRatings() {
+        return totalRatings;
+    }
+
+    public void setTotalRatings(int totalRatings) {
+        this.totalRatings = totalRatings;
+    }
+
+    public int getStockLevel() {
+        return stockLevel;
+    }
+
+    public void setStockLevel(int stockLevel) {
+        this.stockLevel = stockLevel;
     }
 }

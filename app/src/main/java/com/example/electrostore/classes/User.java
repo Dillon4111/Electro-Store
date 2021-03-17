@@ -2,6 +2,7 @@ package com.example.electrostore.classes;
 
 public class User {
     private String uid, name, email, address;
+    private boolean admin;
 
     public User() {
     }
@@ -10,6 +11,7 @@ public class User {
         this.name = name;
         this.email = email;
         this.address = address;
+        this.admin = false;
     }
 
     public String getUid() {
@@ -42,5 +44,24 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "uid='" + uid + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", admin=" + admin +
+                '}';
     }
 }

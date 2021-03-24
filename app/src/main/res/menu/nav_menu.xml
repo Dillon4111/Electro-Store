@@ -8,8 +8,8 @@
                 android:id="@+id/nav_my_orders"
                 android:title="My Orders"/>
             <item
-                android:id="@+id/nav_search_movie"
-                android:title="test2"/>
+                android:id="@+id/nav_my_cart"
+                android:title="My Cart"/>
             <item
                 android:id="@+id/map"
                 android:title="test3"/>

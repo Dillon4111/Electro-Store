@@ -1,22 +1,29 @@
 package com.example.electrostore.classes;
 
+import java.util.List;
+
 public class Product {
 
-    private String id, name, category, description, manufacturer, image;
+    private String id;
+    private String name;
+    private String category;
+    private String description;
+    private String manufacturer;
     private double price, overallRating;
     private int totalRatings, stockLevel;
+    private List<String> images;
 
     public Product() {
     }
 
     public Product(String name, String category, String description,
-                   String manufacturer, String image, double price, int stockLevel) {
+                   String manufacturer, double price, int stockLevel, List<String> images) {
         this.name = name;
         this.category = category;
         this.description = description;
         this.manufacturer = manufacturer;
-        this.image = image;
         this.price = price;
+        this.images = images;
         this.overallRating = 0;
         this.totalRatings = 0;
         this.stockLevel = stockLevel;
@@ -62,14 +69,6 @@ public class Product {
         this.manufacturer = manufacturer;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     public double getPrice() {
         return price;
     }
@@ -100,5 +99,13 @@ public class Product {
 
     public void setStockLevel(int stockLevel) {
         this.stockLevel = stockLevel;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 }

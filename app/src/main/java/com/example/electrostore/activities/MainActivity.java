@@ -6,9 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -16,6 +21,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.electrostore.R;
+import com.example.electrostore.classes.Product;
+import com.example.electrostore.utils.MainProductsAdapter;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,7 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
     private EditText searchTitleEdit, searchCatEdit, searchManuEdit;
@@ -38,7 +45,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
 
+    private DatabaseReference productsDB;
+
     private boolean isAdmin;
+
+    private ArrayList<Product> myDataset = new ArrayList<Product>();
+    private MainProductsAdapter mAdapter;
+    RecyclerView myRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +61,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         checkIfAdmin();
+
+        myRecyclerView = (RecyclerView) findViewById(R.id.mainRecyclerView);
+        myRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager myLayoutManager = new LinearLayoutManager(this);
+        myRecyclerView.setLayoutManager(myLayoutManager);
 
         searchTitleEdit = findViewById(R.id.nameSearch);
         searchCatEdit = findViewById(R.id.categorySearch);
@@ -75,7 +93,121 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+
+        productsDB = FirebaseDatabase.getInstance().getReference("Products");
+        productsDB.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot productSnapshot : snapshot.getChildren()) {
+                    try {
+                        String name = productSnapshot.child("name").getValue().toString();
+                        String price = productSnapshot.child("price").getValue().toString();
+                        String description = productSnapshot.child("description").getValue().toString();
+                        String manufact = productSnapshot.child("manufacturer").getValue().toString();
+                        List<String> images = (List<String>) productSnapshot.child("images").getValue();
+                        String productID = productSnapshot.getKey();
+                        Product product = new Product();
+                        product.setId(productID);
+                        product.setName(name);
+                        product.setPrice(Double.parseDouble(price));
+                        product.setImages(images);
+                        product.setDescription(description);
+                        product.setManufacturer(manufact);
+                        product.setCategory(productSnapshot.child("category").getValue().toString());
+                        myDataset.add(product);
+                    } catch (NullPointerException ignored) {
+                    }
+                }
+                myRecyclerView.setLayoutManager(new LinearLayoutManager((MainActivity.this)));
+                myRecyclerView.setHasFixedSize(true);
+                mAdapter = new MainProductsAdapter(myDataset, MainActivity.this);
+                myRecyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        searchTitleEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString(), 1);
+            }
+        });
+
+        searchCatEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString(), 2);
+            }
+        });
+
+        searchManuEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString(), 3);
+            }
+        });
     }
+
+    public void filter(final String text, int i) {
+        final ArrayList<Product> products = new ArrayList<>();
+
+        if (i == 1) {
+            for (Product product : myDataset) {
+                if (product.getName().toLowerCase().contains(text.toLowerCase())) {
+                    products.add(product);
+                }
+            }
+        } else if (i == 2) {
+            for (Product product : myDataset) {
+                if (product.getCategory().toLowerCase().contains(text.toLowerCase())) {
+                    products.add(product);
+                }
+            }
+        } else if (i == 3) {
+            for (Product product : myDataset) {
+                if (product.getManufacturer().toLowerCase().contains(text.toLowerCase())) {
+                    products.add(product);
+                }
+            }
+        }
+        //mAdapter.notifyDataSetChanged();
+        mAdapter.filteredList(products);
+}
 
 
     @Override
@@ -84,11 +216,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent i;
         switch (id) {
             case R.id.nav_add_product:
-                if(isAdmin) {
+                if (isAdmin) {
                     i = new Intent(MainActivity.this, AddProductActivity.class);
                     startActivity(i);
-                }
-                else {
+                } else {
                     Toast.makeText(MainActivity.this, "Admin needed for access",
                             Toast.LENGTH_LONG).show();
                 }
@@ -105,13 +236,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                i = new Intent(MainActivity.this, SettingsActivity.class);
 //                startActivity(i);
 //                break;
-//            case R.id.nav_log_out:
-//                FirebaseAuth.getInstance().signOut();
-//                Toast.makeText(MainActivity.this, "User signed out", Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(MainActivity.this, SignInActivity.class);
-//                finish();
-//                startActivity(intent);
-//                break;
+            case R.id.nav_log_out:
+                mAuth.signOut();
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(MainActivity.this, "User signed out", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                finish();
+                startActivity(intent);
+                break;
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -129,14 +261,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    if(mUser.getUid().equals(snapshot.getKey())) {
+                    if (mUser.getUid().equals(snapshot.getKey())) {
                         String admin = snapshot.child("admin").getValue().toString();
 
-                        if(admin.equals("true")) {
-                            isAdmin = true;
-                        }
-                        else
-                            isAdmin = false;
+                        isAdmin = admin.equals("true");
 
                         Log.d("Admin = ", String.valueOf(isAdmin));
                     }

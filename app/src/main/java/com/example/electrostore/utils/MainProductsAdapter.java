@@ -47,6 +47,7 @@ public class MainProductsAdapter extends RecyclerView.Adapter<MainProductsAdapte
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View itemView = inflater.inflate(R.layout.product_row, parent, false);
         MyViewHolder viewHolder = new MyViewHolder(itemView);
+        viewHolder.setIsRecyclable(false);
         return viewHolder;
     }
 
@@ -81,6 +82,7 @@ public class MainProductsAdapter extends RecyclerView.Adapter<MainProductsAdapte
     }
 
     public void filteredList(ArrayList<Product> products) {
+        mylistvalues.clear();
         mylistvalues = products;
         notifyDataSetChanged();
     }

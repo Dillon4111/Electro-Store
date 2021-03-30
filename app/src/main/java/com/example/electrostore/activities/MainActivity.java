@@ -11,13 +11,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.electrostore.R;
@@ -33,6 +41,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -67,14 +77,99 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LinearLayoutManager myLayoutManager = new LinearLayoutManager(this);
         myRecyclerView.setLayoutManager(myLayoutManager);
 
+        sortSpinnerList = new ArrayList<>();
+        sortSpinnerList.add("Sort By...");
+        sortSpinnerList.add("Title Ascending");
+        sortSpinnerList.add("Title Descending");
+        sortSpinnerList.add("Price Ascending");
+        sortSpinnerList.add("Price Descending");
+        sortSpinnerList.add("Manufacturer Ascending");
+        sortSpinnerList.add("Manufacturer Descending");
+
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_spinner_item, sortSpinnerList) {
+            @Override
+            public boolean isEnabled(int position) {
+                // Disable the first item from Spinner
+                // First item will be use for hint
+                return position != 0;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView,
+                                        ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if (position == 0) {
+                    // Set the hint text color gray
+                    tv.setTextColor(Color.GRAY);
+                } else {
+                    tv.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+
+        sortSpinner = findViewById(R.id.sortSpinner);
+
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(categoryAdapter);
+
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    switch (position) {
+                        case 3:
+                            Log.d("Case", String.valueOf(position));
+//                            Collections.sort(myDataset, new Comparator<Product>() {
+//                                public int compare(Product p1, Product p2) {
+//                                    if (p1.getPrice() == p2.getPrice())
+//                                        return 0;
+////                                    return p1.getPrice() < p2.getPrice() ? -1 : 1;
+//                                    return (int) (p1.getPrice() - p2.getPrice());
+//                                }
+//                            });
+//                            myDataset.clear();
+//                            mAdapter.notifyDataSetChanged();
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    Collections.sort(myDataset, new Comparator<Product>() {
+                                        public int compare(Product p1, Product p2) {
+                                            if (p1.getPrice() == p2.getPrice())
+                                                return 0;
+                                            return p1.getPrice() < p2.getPrice() ? -1 : 1;
+                                        }
+                                    });
+                                    //myDataset.clear();
+                                    mAdapter.notifyDataSetChanged();
+                                });
+                            });
+                        case 4:
+                            Log.d("Case", String.valueOf(position));
+                            Collections.sort(myDataset, new Comparator<Product>() {
+                                public int compare(Product p1, Product p2) {
+                                    if (p1.getPrice() == p2.getPrice())
+                                        return 0;
+                                    return (int) (p2.getPrice() - p1.getPrice());
+                                }
+                            });
+                            myDataset.clear();
+                            mAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         searchTitleEdit = findViewById(R.id.nameSearch);
         searchCatEdit = findViewById(R.id.categorySearch);
         searchManuEdit = findViewById(R.id.manufactSearch);
         sortSpinner = findViewById(R.id.sortSpinner);
-
-        //sortSpinnerList.add("Sort");
-        sortSpinnerList.add("Ascending");
-        sortSpinnerList.add("Descending");
 
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -99,25 +194,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         productsDB.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                int childCount = (int) snapshot.getChildrenCount();
+//                int count = 0;
                 for (DataSnapshot productSnapshot : snapshot.getChildren()) {
-                    try {
-                        String name = productSnapshot.child("name").getValue().toString();
-                        String price = productSnapshot.child("price").getValue().toString();
-                        String description = productSnapshot.child("description").getValue().toString();
-                        String manufact = productSnapshot.child("manufacturer").getValue().toString();
-                        List<String> images = (List<String>) productSnapshot.child("images").getValue();
-                        String productID = productSnapshot.getKey();
-                        Product product = new Product();
-                        product.setId(productID);
-                        product.setName(name);
-                        product.setPrice(Double.parseDouble(price));
-                        product.setImages(images);
-                        product.setDescription(description);
-                        product.setManufacturer(manufact);
-                        product.setCategory(productSnapshot.child("category").getValue().toString());
-                        myDataset.add(product);
-                    } catch (NullPointerException ignored) {
-                    }
+                    String name = productSnapshot.child("name").getValue().toString();
+                    String price = productSnapshot.child("price").getValue().toString();
+                    String description = productSnapshot.child("description").getValue().toString();
+                    String manufact = productSnapshot.child("manufacturer").getValue().toString();
+                    List<String> images = (List<String>) productSnapshot.child("images").getValue();
+                    String productID = productSnapshot.getKey();
+                    Product product = new Product();
+                    product.setId(productID);
+                    product.setName(name);
+                    product.setPrice(Double.parseDouble(price));
+                    product.setImages(images);
+                    product.setDescription(description);
+                    product.setManufacturer(manufact);
+                    product.setCategory(productSnapshot.child("category").getValue().toString());
+                    myDataset.add(product);
+//
+//                    count++;
+//
+//                    if(count == childCount) {
+//                        break;
+//                    }
                 }
                 myRecyclerView.setLayoutManager(new LinearLayoutManager((MainActivity.this)));
                 myRecyclerView.setHasFixedSize(true);
@@ -186,28 +286,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void filter(final String text, int i) {
         final ArrayList<Product> products = new ArrayList<>();
 
-        if (i == 1) {
-            for (Product product : myDataset) {
-                if (product.getName().toLowerCase().contains(text.toLowerCase())) {
-                    products.add(product);
+        switch (i) {
+            case (1):
+                for (Product product : myDataset) {
+                    if (product.getName().toLowerCase().contains(text.toLowerCase())) {
+                        products.add(product);
+                    }
                 }
-            }
-        } else if (i == 2) {
-            for (Product product : myDataset) {
-                if (product.getCategory().toLowerCase().contains(text.toLowerCase())) {
-                    products.add(product);
+            case (2):
+                for (Product product : myDataset) {
+                    if (product.getCategory().toLowerCase().contains(text.toLowerCase())) {
+                        products.add(product);
+                    }
                 }
-            }
-        } else if (i == 3) {
-            for (Product product : myDataset) {
-                if (product.getManufacturer().toLowerCase().contains(text.toLowerCase())) {
-                    products.add(product);
+            case (3):
+                for (Product product : myDataset) {
+                    if (product.getManufacturer().toLowerCase().contains(text.toLowerCase())) {
+                        products.add(product);
+                    }
                 }
-            }
         }
-        //mAdapter.notifyDataSetChanged();
         mAdapter.filteredList(products);
-}
+        mAdapter.notifyDataSetChanged();
+    }
 
 
     @Override

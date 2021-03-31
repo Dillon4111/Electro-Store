@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,8 +13,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -73,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mUser = mAuth.getCurrentUser();
         checkIfAdmin();
 
-        myRecyclerView = (RecyclerView) findViewById(R.id.mainRecyclerView);
+        myRecyclerView = (RecyclerView) findViewById(R.id.cartRecyclerView);
         myRecyclerView.setHasFixedSize(true);
         LinearLayoutManager myLayoutManager = new LinearLayoutManager(this);
         myRecyclerView.setLayoutManager(myLayoutManager);
@@ -302,6 +299,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         Intent i;
         switch (id) {
+            case R.id.nav_my_cart:
+                i = new Intent(MainActivity.this, CartActivity.class);
+                startActivity(i);
+                break;
             case R.id.nav_add_product:
                 if (isAdmin) {
                     i = new Intent(MainActivity.this, AddProductActivity.class);

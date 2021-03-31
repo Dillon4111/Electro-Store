@@ -13,11 +13,11 @@
         android:fitsSystemWindows="true">
 
         <Button
-            android:id="@+id/buyNowButton"
-            android:layout_width="117dp"
-            android:layout_height="39dp"
+            android:id="@+id/addToCartButton"
+            android:layout_width="151dp"
+            android:layout_height="54dp"
             android:layout_marginTop="496dp"
-            android:text="Buy Now"
+            android:text="Add To CArt"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

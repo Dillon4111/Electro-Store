@@ -74,7 +74,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/mainRecyclerView"
+            android:id="@+id/cartRecyclerView"
             android:layout_width="362dp"
             android:layout_height="498dp"
             android:layout_marginTop="201dp"

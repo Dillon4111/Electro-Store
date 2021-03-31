@@ -1,8 +1,11 @@
 package com.example.electrostore.classes;
 
+import java.util.ArrayList;
+
 public class User {
     private String uid, name, email, address;
     private boolean admin;
+    private ArrayList<Product> cart;
 
     public User() {
     }
@@ -12,6 +15,7 @@ public class User {
         this.email = email;
         this.address = address;
         this.admin = false;
+        this.cart = new ArrayList<>();
     }
 
     public String getUid() {
@@ -52,6 +56,14 @@ public class User {
 
     public void setAdmin(boolean admin) {
         this.admin = admin;
+    }
+
+    public ArrayList<Product> getCart() {
+        return cart;
+    }
+
+    public void setCart(ArrayList<Product> cart) {
+        this.cart = cart;
     }
 
     @Override

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -116,47 +117,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sortSpinner.setAdapter(categoryAdapter);
 
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @SuppressLint("NewApi")
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0) {
-                    switch (position) {
-                        case 3:
-                            Log.d("Case", String.valueOf(position));
-//                            Collections.sort(myDataset, new Comparator<Product>() {
-//                                public int compare(Product p1, Product p2) {
-//                                    if (p1.getPrice() == p2.getPrice())
-//                                        return 0;
-////                                    return p1.getPrice() < p2.getPrice() ? -1 : 1;
-//                                    return (int) (p1.getPrice() - p2.getPrice());
-//                                }
-//                            });
-//                            myDataset.clear();
-//                            mAdapter.notifyDataSetChanged();
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                new Handler(Looper.getMainLooper()).post(() -> {
-                                    Collections.sort(myDataset, new Comparator<Product>() {
-                                        public int compare(Product p1, Product p2) {
-                                            if (p1.getPrice() == p2.getPrice())
-                                                return 0;
-                                            return p1.getPrice() < p2.getPrice() ? -1 : 1;
-                                        }
-                                    });
-                                    //myDataset.clear();
-                                    mAdapter.notifyDataSetChanged();
-                                });
-                            });
-                        case 4:
-                            Log.d("Case", String.valueOf(position));
-                            Collections.sort(myDataset, new Comparator<Product>() {
-                                public int compare(Product p1, Product p2) {
-                                    if (p1.getPrice() == p2.getPrice())
-                                        return 0;
-                                    return (int) (p2.getPrice() - p1.getPrice());
-                                }
-                            });
-                            myDataset.clear();
-                            mAdapter.notifyDataSetChanged();
+                    if (position == 1) {
+                        Collections.sort(myDataset, Comparator.comparing(Product::getName));
                     }
+                    else if (position == 2) {
+                        Collections.sort(myDataset, Comparator.comparing(Product::getName).reversed());
+                    }
+                    else if (position == 3) {
+                        Log.d("Case", String.valueOf(position));
+                        myDataset.sort(Comparator.comparing(Product::getPrice));
+                    }
+                    else if (position == 4) {
+                        Log.d("Case", String.valueOf(position));
+                        myDataset.sort(Comparator.comparing(Product::getPrice).reversed());
+                    }
+                    else if (position == 5) {
+                        Collections.sort(myDataset, Comparator.comparing(Product::getManufacturer));
+                    }
+                    else if (position == 6) {
+                        Collections.sort(myDataset, Comparator.comparing(Product::getManufacturer).reversed());
+                    }
+
+                    mAdapter.filteredList(myDataset);
                 }
             }
 
@@ -283,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public void filter(final String text, int i) {
-        final ArrayList<Product> products = new ArrayList<>();
+    public void filter(String text, int i) {
+        ArrayList<Product> products = new ArrayList<>();
 
         switch (i) {
             case (1):
@@ -307,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
         }
         mAdapter.filteredList(products);
-        mAdapter.notifyDataSetChanged();
+        //mAdapter.notifyDataSetChanged();
     }
 
 

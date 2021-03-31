@@ -1,6 +1,8 @@
 package com.example.electrostore.utils;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.electrostore.R;
+import com.example.electrostore.activities.ProductDetailsActivity;
 import com.example.electrostore.classes.Product;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
@@ -68,10 +71,10 @@ public class MainProductsAdapter extends RecyclerView.Adapter<MainProductsAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Log.d("FAVOURITES PRODUCT", product.getName());
-//                Intent intent = new Intent(context, ProductDetailsActivity.class);
-//                intent.putExtra("PRODUCT_INTENT", product);
-//                context.startActivity(intent);
+                Log.d("FAVOURITES PRODUCT", product.getName());
+                Intent intent = new Intent(context, ProductDetailsActivity.class);
+                intent.putExtra("PRODUCT_INTENT", product);
+                context.startActivity(intent);
             }
         });
     }
@@ -82,7 +85,6 @@ public class MainProductsAdapter extends RecyclerView.Adapter<MainProductsAdapte
     }
 
     public void filteredList(ArrayList<Product> products) {
-        mylistvalues.clear();
         mylistvalues = products;
         notifyDataSetChanged();
     }

@@ -43,6 +43,11 @@ public class SignInActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        if(mAuth.getCurrentUser() != null) {
+            startActivity(new Intent(SignInActivity.this, MainActivity.class));
+            return;
+        }
+
         signInEmail = findViewById(R.id.signInEmail);
         signInPassword = findViewById(R.id.signInPassword);
         signInButton = findViewById(R.id.signInButton);

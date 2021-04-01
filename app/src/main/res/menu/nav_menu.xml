@@ -5,14 +5,11 @@
         <group android:checkableBehavior="single">
         <menu>
             <item
-                android:id="@+id/nav_my_orders"
-                android:title="My Orders"/>
-            <item
                 android:id="@+id/nav_my_cart"
                 android:title="My Cart"/>
             <item
-                android:id="@+id/map"
-                android:title="test3"/>
+                android:id="@+id/nav_my_orders"
+                android:title="My Orders"/>
         </menu>
         </group>
     </item>
@@ -36,9 +33,6 @@
     <item android:title="OTHER">
         <group android:checkableBehavior="single">
         <menu>
-            <item
-                android:id="@+id/nav_settings"
-                android:title="Settings"/>
             <item
                 android:id="@+id/nav_log_out"
                 android:title="Log Out"/>

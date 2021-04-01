@@ -194,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     product.setDescription(description);
                     product.setManufacturer(manufact);
                     product.setCategory(productSnapshot.child("category").getValue().toString());
+                    long stock = (long) productSnapshot.child("stockLevel").getValue();
+                    product.setStockLevel((int) stock);
                     myDataset.add(product);
 //
 //                    count++;

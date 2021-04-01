@@ -1,18 +1,18 @@
 package com.example.electrostore.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.electrostore.R;
 import com.example.electrostore.classes.Product;
@@ -31,12 +31,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class CartActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
     private FirebaseUser mUser;
 
     private ArrayList<Product> cart = new ArrayList<Product>();
@@ -44,14 +44,14 @@ public class CartActivity extends AppCompatActivity {
     RecyclerView myRecyclerView;
 
     private TextView totalTextView;
-    private Button payNowButton;
+    double totalPrice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
         myRecyclerView = (RecyclerView) findViewById(R.id.cartRecyclerView);
@@ -74,23 +74,23 @@ public class CartActivity extends AppCompatActivity {
                             Log.d("IF", "HELLO");
                         }
 
-                        double totalPrice = 0;
+                        totalPrice = 0;
                         for (Product p : cart) {
                             totalPrice += p.getPrice();
                         }
 
                         totalTextView = findViewById(R.id.shoppingCartTotalText);
 
-                        if(!cart.isEmpty()) {
+                        if (!cart.isEmpty()) {
                             totalTextView.setText("Total Price: €" + totalPrice);
-                        }
-                        else {
+                        } else {
                             totalTextView.setText("Cart is empty");
                         }
 
                         myRecyclerView.setLayoutManager(new LinearLayoutManager(CartActivity.this));
                         myRecyclerView.setHasFixedSize(true);
                         mAdapter = new MainProductsAdapter(cart, CartActivity.this);
+                        new ItemTouchHelper(itemTouch).attachToRecyclerView(myRecyclerView);
                         myRecyclerView.setAdapter(mAdapter);
 
                         break;
@@ -104,67 +104,100 @@ public class CartActivity extends AppCompatActivity {
             }
         });
 
-        payNowButton = findViewById(R.id.payNowButton);
-        payNowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!cart.isEmpty()) {
-                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(CartActivity.this);
+        Button payNowButton = findViewById(R.id.payNowButton);
+        payNowButton.setOnClickListener(v -> {
+            if (!cart.isEmpty()) {
+                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(CartActivity.this);
 
-                    List<String> productIDs = new ArrayList<>();
-                    HashMap<String, Integer> hashMap = new HashMap<String, Integer>();
+                List<String> productIDs = new ArrayList<>();
+                HashMap<String, Integer> hashMap = new HashMap<>();
 
-                    for (Product p : cart) {
-                        productIDs.add(p.getId());
-                    }
-
-                    for (String productID : productIDs) {
-                        int occurrences = Collections.frequency(productIDs, productID);
-                        hashMap.put(productID, occurrences);
-                    }
-
-                    Iterator it = hashMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry pair = (Map.Entry) it.next();
-                        Log.d("HashMap", pair.getKey() + " = " + pair.getValue());
-
-                        reduceProductStock(pair.getKey().toString(), (Integer) pair.getValue());
-                    }
-
-                    DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
-                    userDB.child(mUser.getUid()).child("cart").setValue(new ArrayList<Product>());
-
-                    cart.clear();
-                    mAdapter.notifyDataSetChanged();
-
-                    totalTextView.setText("Cart is empty");
-
-                    dlgAlert.setMessage("Thank you for your purchase. " +
-                            "Your order will be dispatched within 2 working days.");
-                    dlgAlert.setTitle("Transaction Approved");
-                    dlgAlert.setPositiveButton("OK", null);
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
-
-                    dlgAlert.setPositiveButton("Ok",
-                            (dialog, which) -> {
-                            });
+                for (Product p : cart) {
+                    productIDs.add(p.getId());
                 }
-                else {
-                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(CartActivity.this);
-                    dlgAlert.setMessage("Shopping cart is empty.");
-                    dlgAlert.setTitle("Error");
-                    dlgAlert.setPositiveButton("OK", null);
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
 
-                    dlgAlert.setPositiveButton("Ok",
-                            (dialog, which) -> {
-                            });
+                for (String productID : productIDs) {
+                    int occurrences = Collections.frequency(productIDs, productID);
+                    hashMap.put(productID, occurrences);
                 }
+
+                Iterator it = hashMap.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    Log.d("HashMap", pair.getKey() + " = " + pair.getValue());
+
+                    reduceProductStock(pair.getKey().toString(), (Integer) pair.getValue());
+                }
+
+                DatabaseReference userDB1 = FirebaseDatabase.getInstance().getReference("Users");
+                userDB1.child(mUser.getUid()).child("cart").setValue(new ArrayList<Product>());
+
+                DatabaseReference orderDetails = FirebaseDatabase.getInstance().getReference("User_OrderHistory");
+                orderDetails.child(mUser.getUid()).setValue(cart);
+
+                cart.clear();
+                mAdapter.notifyDataSetChanged();
+
+                totalTextView.setText("Cart is empty");
+
+                dlgAlert.setMessage("Thank you for your purchase. " +
+                        "Your order will be dispatched within 2 working days.");
+                dlgAlert.setTitle("Transaction Approved");
+                dlgAlert.setPositiveButton("OK", null);
+                dlgAlert.setCancelable(true);
+                dlgAlert.create().show();
+
+                dlgAlert.setPositiveButton("Ok",
+                        (dialog, which) -> {
+                        });
+            } else {
+                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(CartActivity.this);
+                dlgAlert.setMessage("Shopping cart is empty.");
+                dlgAlert.setTitle("Error");
+                dlgAlert.setPositiveButton("OK", null);
+                dlgAlert.setCancelable(true);
+                dlgAlert.create().show();
+
+                dlgAlert.setPositiveButton("Ok",
+                        (dialog, which) -> {
+                        });
             }
         });
     }
+
+    ItemTouchHelper.SimpleCallback itemTouch = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    //.addBackgroundColor(ContextCompat.getColor(UserProductsActivity.this, R.color.grey))
+                    .addActionIcon(R.drawable.ic_baseline_delete_24)
+                    .create()
+                    .decorate();
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            Toast.makeText(CartActivity.this, "Removed from cart", Toast.LENGTH_SHORT).show();
+            final Product product = cart.get(viewHolder.getAdapterPosition());
+            Log.d("PRODUCT ID", product.getId());
+            cart.remove(viewHolder.getAdapterPosition());
+
+            final DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
+
+            userDB.child(mUser.getUid()).child("cart").setValue(cart);
+            //myDataset.clear();
+            mAdapter.notifyDataSetChanged();
+
+            totalPrice = totalPrice - product.getPrice();
+            totalTextView.setText("Total Price: €" + totalPrice);
+        }
+    };
 
     public void reduceProductStock(String id, int count) {
         Log.d("Method", id + count);
@@ -178,11 +211,8 @@ public class CartActivity extends AppCompatActivity {
                     if (productSnap.getKey().equals(id)) {
 
                         long stockLevel = (long) productSnap.child("stockLevel").getValue();
-
                         stockLevel = stockLevel - count;
-
                         productDB.child(productSnap.getKey()).child("stockLevel").setValue(stockLevel);
-
                     }
                 }
             }

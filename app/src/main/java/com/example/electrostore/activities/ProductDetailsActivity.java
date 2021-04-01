@@ -85,6 +85,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
 
+                Log.d("STOCK", String.valueOf(product.getStockLevel()));
+
                 if(product.getStockLevel() > 0) {
 
                     userDB.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -116,7 +118,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                         }
                     });
                 }
-                else {
+                else if(product.getStockLevel() <= 0){
                     AlertDialog.Builder dlgAlert = new AlertDialog.Builder(ProductDetailsActivity.this);
                     dlgAlert.setMessage("Item is out of stock.");
                     dlgAlert.setTitle("Error");

@@ -16,8 +16,18 @@
             android:id="@+id/addToCartButton"
             android:layout_width="151dp"
             android:layout_height="54dp"
-            android:layout_marginTop="496dp"
+            android:layout_marginTop="484dp"
             android:text="Add To CArt"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/reviewProduct"
+            android:layout_width="151dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="744dp"
+            android:text="Review Product"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -36,8 +46,8 @@
 
         <TextView
             android:id="@+id/productDescription"
-            android:layout_width="293dp"
-            android:layout_height="147dp"
+            android:layout_width="292dp"
+            android:layout_height="141dp"
             android:layout_marginTop="324dp"
             android:gravity="center"
             android:textSize="18sp"
@@ -161,9 +171,8 @@
             android:id="@+id/productImageViewDetails"
             android:layout_width="171dp"
             android:layout_height="168dp"
-            android:layout_marginTop="572dp"
+            android:layout_marginTop="556dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_menu_gallery" />

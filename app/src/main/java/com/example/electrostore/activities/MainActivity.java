@@ -305,6 +305,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 i = new Intent(MainActivity.this, CartActivity.class);
                 startActivity(i);
                 break;
+            case R.id.nav_my_orders:
+                i = new Intent(MainActivity.this, MyOrdersHistory.class);
+                startActivity(i);
+                break;
             case R.id.nav_add_product:
                 if (isAdmin) {
                     i = new Intent(MainActivity.this, AddProductActivity.class);
@@ -318,10 +322,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                i = new Intent(MainActivity.this, SearchActivity.class);
 //                startActivity(i);
 //                break;
-//            case R.id.map:
-//                i = new Intent(MainActivity.this, MapsActivity.class);
-//                startActivity(i);
-//                break;
+            case R.id.nav_customer_details:
+                i = new Intent(MainActivity.this, CustomerDetailsActivity.class);
+                startActivity(i);
+                break;
 //            case R.id.nav_settings:
 //                i = new Intent(MainActivity.this, SettingsActivity.class);
 //                startActivity(i);

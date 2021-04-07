@@ -1,8 +1,12 @@
 package com.example.electrostore.classes;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User {
+@IgnoreExtraProperties
+public class User implements Serializable {
     private String uid, name, email, address;
     private boolean admin;
     private ArrayList<Product> cart;

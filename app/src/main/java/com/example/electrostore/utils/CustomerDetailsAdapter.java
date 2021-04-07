@@ -9,9 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.electrostore.R;
+import com.example.electrostore.activities.CustomerDetailsActivity;
+import com.example.electrostore.activities.CustomerOrderHistoryActivity;
 import com.example.electrostore.activities.ProductDetailsActivity;
 import com.example.electrostore.classes.Product;
 import com.example.electrostore.classes.User;
@@ -59,7 +62,7 @@ public class CustomerDetailsAdapter extends RecyclerView.Adapter<CustomerDetails
         final FirebaseStorage storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        User user = mylistvalues.get(position);
+        final User user = mylistvalues.get(position);
         holder.nameView.setText("Name: " + user.getName());
         holder.emailView.setText("Email: " + user.getEmail());
         holder.addressView.setText("Address: " + user.getAddress());
@@ -68,10 +71,9 @@ public class CustomerDetailsAdapter extends RecyclerView.Adapter<CustomerDetails
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Log.d("FAVOURITES PRODUCT", product.getName());
-//                Intent intent = new Intent(context, ProductDetailsActivity.class);
-//                intent.putExtra("PRODUCT_INTENT", product);
-//                context.startActivity(intent);
+                Intent intent = new Intent(context, CustomerOrderHistoryActivity.class);
+                intent.putExtra("USER_INTENT", user);
+                context.startActivity(intent);
             }
         });
     }

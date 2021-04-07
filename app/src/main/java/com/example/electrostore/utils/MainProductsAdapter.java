@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.electrostore.R;
+import com.example.electrostore.activities.MyOrdersHistory;
 import com.example.electrostore.activities.ProductDetailsActivity;
 import com.example.electrostore.classes.Product;
 import com.google.firebase.database.DatabaseReference;
@@ -71,9 +72,12 @@ public class MainProductsAdapter extends RecyclerView.Adapter<MainProductsAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("FAVOURITES PRODUCT", product.getName());
                 Intent intent = new Intent(context, ProductDetailsActivity.class);
                 intent.putExtra("PRODUCT_INTENT", product);
+
+                if(context.getClass() == MyOrdersHistory.class) {
+                    intent.putExtra("DETAILS_INTENT", true); //customer bought the product previously
+                }
                 context.startActivity(intent);
             }
         });

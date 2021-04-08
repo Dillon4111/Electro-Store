@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.electrostore.R;
+import com.example.electrostore.classes.Order;
 import com.example.electrostore.classes.Product;
 import com.example.electrostore.classes.User;
 import com.example.electrostore.utils.MainProductsAdapter;
@@ -24,9 +25,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +42,8 @@ public class CartActivity extends AppCompatActivity {
 
     private FirebaseUser mUser;
 
-    private ArrayList<Product> cart = new ArrayList<Product>();
+    private ArrayList<Product> cart, cart2 = new ArrayList<Product>();
+    private Order order;
     private MainProductsAdapter mAdapter;
     RecyclerView myRecyclerView;
 
@@ -129,11 +133,75 @@ public class CartActivity extends AppCompatActivity {
                     reduceProductStock(pair.getKey().toString(), (Integer) pair.getValue());
                 }
 
-                DatabaseReference userDB1 = FirebaseDatabase.getInstance().getReference("Users");
-                userDB1.child(mUser.getUid()).child("cart").setValue(new ArrayList<Product>());
-
                 DatabaseReference orderDetails = FirebaseDatabase.getInstance().getReference("User_OrderHistory");
-                orderDetails.child(mUser.getUid()).setValue(cart);
+                orderDetails.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot1) {
+                        if (snapshot1.hasChild(mUser.getUid())) {
+                            final DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
+
+                            userDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for (DataSnapshot userSnap : snapshot.getChildren()) {
+                                        if(userSnap.getKey().equals(mUser.getUid())) {
+                                            User user = userSnap.getValue(User.class);
+
+                                            cart2 = user.getCart();
+                                        }
+                                    }
+                                    GenericTypeIndicator<ArrayList<Order>> t = new GenericTypeIndicator<ArrayList<Order>>() {};
+                                    ArrayList<Order> orders = snapshot1.child(mUser.getUid()).getValue(t);
+                                    Order order = new Order(mUser.getUid(), cart2);
+                                    orders.add(order);
+                                    orderDetails.child(mUser.getUid()).setValue(orders);
+
+                                    DatabaseReference userDB1 = FirebaseDatabase.getInstance().getReference("Users");
+                                    userDB1.child(mUser.getUid()).child("cart").setValue(new ArrayList<Product>());
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+
+                        } else {
+                            final DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
+
+                            userDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for (DataSnapshot userSnap : snapshot.getChildren()) {
+                                        if(userSnap.getKey().equals(mUser.getUid())) {
+                                            User user = userSnap.getValue(User.class);
+
+                                            cart2 = user.getCart();
+                                        }
+                                    }
+                                    ArrayList<Order> orders = new ArrayList<>();
+                                    order = new Order(mUser.getUid(), cart2);
+                                    orders.add(order);
+                                    orderDetails.child(mUser.getUid()).setValue(orders);
+                                    Log.d("TAGGGGG", "FALSE");
+
+                                    DatabaseReference userDB1 = FirebaseDatabase.getInstance().getReference("Users");
+                                    userDB1.child(mUser.getUid()).child("cart").setValue(new ArrayList<Product>());
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
                 cart.clear();
                 mAdapter.notifyDataSetChanged();
@@ -222,5 +290,9 @@ public class CartActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public ArrayList<Product> getCart() {
+        return cart;
     }
 }

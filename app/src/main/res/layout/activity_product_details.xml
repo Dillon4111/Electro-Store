@@ -23,7 +23,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/reviewProduct"
+            android:id="@+id/reviewProductButton"
             android:layout_width="151dp"
             android:layout_height="54dp"
             android:layout_marginTop="744dp"

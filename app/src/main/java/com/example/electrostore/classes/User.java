@@ -78,6 +78,7 @@ public class User implements Serializable {
                 ", email='" + email + '\'' +
                 ", address='" + address + '\'' +
                 ", admin=" + admin +
+                ", cart=" + cart +
                 '}';
     }
 }

@@ -73,12 +73,17 @@ public class MainProductsAdapter extends RecyclerView.Adapter<MainProductsAdapte
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, ProductDetailsActivity.class);
-                intent.putExtra("PRODUCT_INTENT", product);
 
                 if(context.getClass() == MyOrdersHistory.class) {
-                    intent.putExtra("DETAILS_INTENT", true); //customer bought the product previously
+                    intent.putExtra("PRODUCT_INTENT", product);
+                    intent.putExtra("DETAILS_INTENT", "BOUGHT");
+                    context.startActivity(intent);
                 }
-                context.startActivity(intent);
+                else {
+                    intent.putExtra("PRODUCT_INTENT", product);
+                    intent.putExtra("DETAILS_INTENT", "NOT BOUGHT");
+                    context.startActivity(intent);
+                }
             }
         });
     }

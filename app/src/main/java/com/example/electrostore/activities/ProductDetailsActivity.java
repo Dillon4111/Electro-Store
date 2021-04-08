@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.electrostore.R;
 import com.example.electrostore.classes.Product;
+import com.example.electrostore.classes.User;
 import com.example.electrostore.utils.GlideApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,11 +36,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
     private TextView productName, productPrice, productCategory, productManufacturer, productDescription;
     private StorageReference storageReference;
     Product product;
-    private Button buyButton;
+    private Button buyButton, reviewButton;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private ImageView imageView;
     List<Product> cart = new ArrayList<>();
+
+    private String m_Text = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +52,16 @@ public class ProductDetailsActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
+        Log.d("USERNAME", mUser.getDisplayName());
+
         Intent i = getIntent();
         product = (Product) i.getSerializableExtra("PRODUCT_INTENT");
+        String isBought = (String) i.getSerializableExtra("DETAILS_INTENT");
+
+        reviewButton = findViewById(R.id.reviewProductButton);
+
+        if (isBought.equals("NOT BOUGHT"))
+            reviewButton.setVisibility(View.GONE);
 
         productName = findViewById(R.id.productName);
         productPrice = findViewById(R.id.productPrice);
@@ -87,7 +98,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
                 Log.d("STOCK", String.valueOf(product.getStockLevel()));
 
-                if(product.getStockLevel() > 0) {
+                if (product.getStockLevel() > 0) {
 
                     userDB.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -117,8 +128,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
                         }
                     });
-                }
-                else if(product.getStockLevel() <= 0){
+                } else if (product.getStockLevel() <= 0) {
                     AlertDialog.Builder dlgAlert = new AlertDialog.Builder(ProductDetailsActivity.this);
                     dlgAlert.setMessage("Item is out of stock.");
                     dlgAlert.setTitle("Error");
@@ -130,6 +140,16 @@ public class ProductDetailsActivity extends AppCompatActivity {
                             (DialogInterface.OnClickListener) (dialog, which) -> {
                             });
                 }
+            }
+        });
+
+        reviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ProductDetailsActivity.this, ReviewProductActivity.class);
+                i.putExtra("PRODUCT_INTENT", product);
+
+                startActivity(i);
             }
         });
     }

@@ -69,7 +69,7 @@ public class AddProductActivity extends AppCompatActivity {
 
         editName = findViewById(R.id.editProductName);
         editPrice = findViewById(R.id.editProductPrice);
-        editDescription = findViewById(R.id.editDescription);
+        editDescription = findViewById(R.id.editReview);
         editCategory = findViewById(R.id.editCategoryText);
         editManufact = findViewById(R.id.editManufactText);
         editStockLvl = findViewById(R.id.editStockLevelText);

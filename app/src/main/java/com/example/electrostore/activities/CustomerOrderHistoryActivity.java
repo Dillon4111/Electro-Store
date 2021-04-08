@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.electrostore.R;
+import com.example.electrostore.classes.Order;
 import com.example.electrostore.classes.Product;
 import com.example.electrostore.classes.User;
 import com.example.electrostore.utils.CustomerDetailsAdapter;
@@ -22,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -60,10 +62,20 @@ public class CustomerOrderHistoryActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot userSnap : snapshot.getChildren()) {
                     if(userSnap.getKey().equals(user.getUid())) {
-                        for (DataSnapshot snap: userSnap.getChildren()) {
-                            Product product = snap.getValue(Product.class);
-                            products.add(product);
+//                        for (DataSnapshot snap: userSnap.getChildren()) {
+//                            Product product = snap.getValue(Product.class);
+//                            products.add(product);
+//                        }
+                        GenericTypeIndicator<ArrayList<Order>> t = new GenericTypeIndicator<ArrayList<Order>>() {};
+                        ArrayList<Order> orders = userSnap.getValue(t);
+
+                        Log.d("TEST", "12234");
+
+                        for(Order o: orders) {
+                            Log.d("ORDER", o.getUserID());
+                            products.addAll(o.getProducts());
                         }
+                        break;
                     }
                 }
                 orderRecyclerView.setLayoutManager(new LinearLayoutManager(CustomerOrderHistoryActivity.this));

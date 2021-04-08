@@ -16,6 +16,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.electrostore.R;
+import com.example.electrostore.classes.Order;
 import com.example.electrostore.classes.Product;
 import com.example.electrostore.classes.Review;
 import com.example.electrostore.classes.User;
@@ -26,7 +27,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class ReviewProductActivity extends AppCompatActivity {
 
@@ -54,7 +58,7 @@ public class ReviewProductActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot userSnap : snapshot.getChildren()) {
-                    if(userSnap.getKey().equals(mUser.getUid())) {
+                    if (userSnap.getKey().equals(mUser.getUid())) {
                         user = userSnap.getValue(User.class);
                     }
                 }
@@ -95,10 +99,36 @@ public class ReviewProductActivity extends AppCompatActivity {
                 newRating = ratingBar.getRating();
                 String description = editText.getText().toString();
 
-                Review review = new Review(description, product.getId(), newRating, user.getName());
-
                 DatabaseReference reviewDB = FirebaseDatabase.getInstance().getReference("Product_Reviews");
-                reviewDB.child(product.getId()).setValue(review);
+                reviewDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(product.getId())) {
+//                            final DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
+//
+//
+                            GenericTypeIndicator<ArrayList<Review>> t = new GenericTypeIndicator<ArrayList<Review>>() {
+                            };
+                            ArrayList<Review> reviews = snapshot.child(product.getId()).getValue(t);
+                            Review review = new Review(description, product.getId(), newRating, user.getName());
+                            reviews.add(review);
+                            reviewDB.child(product.getId()).setValue(reviews);
+                            Log.d("REVIEW", "TRUE");
+
+                        } else {
+                            Log.d("REVIEW", "FALSE");
+                            ArrayList<Review> reviews = new ArrayList<>();
+                            Review review = new Review(description, product.getId(), newRating, user.getName());
+                            reviews.add(review);
+                            reviewDB.child(product.getId()).setValue(reviews);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
                 final DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
 
@@ -106,7 +136,7 @@ public class ReviewProductActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot productSnap : snapshot.getChildren()) {
-                            if(productSnap.getKey().equals(product.getId())) {
+                            if (productSnap.getKey().equals(product.getId())) {
                                 newProduct = productSnap.getValue(Product.class);
 
                                 break;
@@ -124,8 +154,7 @@ public class ReviewProductActivity extends AppCompatActivity {
                         DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
                         productDB.child(product.getId()).setValue(newProduct);
 
-                        Intent i = new Intent(ReviewProductActivity.this, ProductDetailsActivity.class);
-                        startActivity(i);
+                        finish();
                     }
 
                     @Override

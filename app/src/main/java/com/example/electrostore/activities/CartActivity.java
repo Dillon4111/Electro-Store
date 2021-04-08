@@ -70,6 +70,7 @@ public class CartActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot userSnap : snapshot.getChildren()) {
                     if (userSnap.getKey().equals(mUser.getUid())) {
+                        cart = new ArrayList<>();
                         if (userSnap.child("cart").exists()) {
 
                             User user = userSnap.getValue(User.class);

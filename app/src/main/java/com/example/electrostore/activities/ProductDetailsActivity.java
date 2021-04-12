@@ -2,6 +2,9 @@ package com.example.electrostore.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -15,15 +18,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.electrostore.R;
+import com.example.electrostore.classes.Order;
 import com.example.electrostore.classes.Product;
+import com.example.electrostore.classes.Review;
 import com.example.electrostore.classes.User;
 import com.example.electrostore.utils.GlideApp;
+import com.example.electrostore.utils.MainProductsAdapter;
+import com.example.electrostore.utils.ProductReviewsAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -40,9 +48,12 @@ public class ProductDetailsActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private ImageView imageView;
-    List<Product> cart = new ArrayList<>();
-
+    private List<Product> cart = new ArrayList<>();
+    private ArrayList<Review> reviews = new ArrayList<>();
+    private ProductReviewsAdapter reviewsAdapter;
+    private RecyclerView myRecyclerView;
     private String m_Text = "";
+    private TextView emptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,6 +161,46 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 i.putExtra("PRODUCT_INTENT", product);
 
                 startActivity(i);
+            }
+        });
+
+        myRecyclerView = (RecyclerView) findViewById(R.id.reviewRecyclerView);
+        myRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager myLayoutManager = new LinearLayoutManager(this);
+        myRecyclerView.setLayoutManager(myLayoutManager);
+
+        DatabaseReference reviewDB = FirebaseDatabase.getInstance().getReference("Product_Reviews");
+        reviewDB.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot reviewSnap: snapshot.getChildren()) {
+                    if(product.getId().equals(reviewSnap.getKey())) {
+                       for(DataSnapshot reviewSnap2: reviewSnap.getChildren()) {
+                           Review review = reviewSnap2.getValue(Review.class);
+                           reviews.add(review);
+                       }
+                    }
+                }
+                myRecyclerView.setLayoutManager(new LinearLayoutManager(ProductDetailsActivity.this));
+                myRecyclerView.setHasFixedSize(true);
+                reviewsAdapter = new ProductReviewsAdapter(reviews, ProductDetailsActivity.this);
+                myRecyclerView.setAdapter(reviewsAdapter);
+
+                emptyView = findViewById(R.id.emptyReviewText);
+
+                if (reviews.isEmpty()) {
+                    myRecyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    myRecyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }

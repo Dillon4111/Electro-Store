@@ -1,12 +1,13 @@
 package com.example.electrostore.classes;
 
+import com.example.electrostore.patterns.Strategy;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
 import java.util.List;
 
 @IgnoreExtraProperties
-public class Product implements Serializable {
+public class Product implements Serializable, Strategy {
 
     private String id;
     private String name;
@@ -111,5 +112,11 @@ public class Product implements Serializable {
 
     public void setImages(List<String> images) {
         this.images = images;
+    }
+
+    @Override
+    public double calculateDiscount(double price, double rate) {
+        double substraction = price * rate;
+        return this.price - substraction;
     }
 }

@@ -30,13 +30,14 @@
 
     <TextView
         android:id="@+id/shoppingCartTotalText"
-        android:layout_width="195dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="600dp"
+        android:layout_width="367dp"
+        android:layout_height="73dp"
+        android:layout_marginTop="588dp"
         android:gravity="center"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

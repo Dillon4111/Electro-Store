@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private FirebaseUser mUser;
     private DatabaseReference db;
     private EditText userNameEdit, emailEdit, passwordEdit, confPasswordEdit, addressEdit;
+    private RadioButton radioButton;
     FirebaseStorage storage;
     StorageReference storageReference;
 
@@ -54,6 +56,7 @@ public class RegistrationActivity extends AppCompatActivity {
         confPasswordEdit = findViewById(R.id.registerConfirmPassword);
         Button registerButton = findViewById(R.id.registerButton);
         addressEdit = findViewById(R.id.addressEditText);
+        radioButton = findViewById(R.id.studentRadioButton);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +66,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 final String password = passwordEdit.getText().toString();
                 String confPassword = confPasswordEdit.getText().toString();
                 final String address = addressEdit.getText().toString();
+                boolean student = radioButton.isChecked();
 
                 if (userName.matches("") || email.matches("") ||
                         password.matches("") || confPassword.matches("") ||
@@ -107,7 +111,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         Log.d("Register", "createUserWithEmail:success");
                                         mUser = mAuth.getCurrentUser();
-                                        User user = new User(userName, email, address);
+                                        User user = new User(userName, email, address, student);
                                         String uid = mUser.getUid();
                                         db.child("Users").child(uid).setValue(user)
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {

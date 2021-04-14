@@ -8,18 +8,19 @@ import java.util.ArrayList;
 @IgnoreExtraProperties
 public class User implements Serializable {
     private String uid, name, email, address;
-    private boolean admin;
+    private boolean admin, student;
     private ArrayList<Product> cart;
 
     public User() {
     }
 
-    public User(String name, String email, String address) {
+    public User(String name, String email, String address, boolean student) {
         this.name = name;
         this.email = email;
         this.address = address;
         this.admin = false;
         this.cart = new ArrayList<>();
+        this.student = student;
     }
 
     public String getUid() {
@@ -68,6 +69,14 @@ public class User implements Serializable {
 
     public void setCart(ArrayList<Product> cart) {
         this.cart = cart;
+    }
+
+    public boolean isStudent() {
+        return student;
+    }
+
+    public void setStudent(boolean student) {
+        this.student = student;
     }
 
     @Override

@@ -49,6 +49,7 @@ public class CartActivity extends AppCompatActivity {
 
     private TextView totalTextView;
     double totalPrice = 0;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,21 +74,32 @@ public class CartActivity extends AppCompatActivity {
                         cart = new ArrayList<>();
                         if (userSnap.child("cart").exists()) {
 
-                            User user = userSnap.getValue(User.class);
+                            user = userSnap.getValue(User.class);
 
                             cart = user.getCart();
                             Log.d("IF", "HELLO");
                         }
 
                         totalPrice = 0;
+
                         for (Product p : cart) {
-                            totalPrice += p.getPrice();
+                            if(user.isStudent()) {
+                                totalPrice += p.calculateDiscount(p.getPrice(), 0.2);
+                            }
+                            else {
+                                totalPrice += p.getPrice();
+                            }
                         }
 
                         totalTextView = findViewById(R.id.shoppingCartTotalText);
 
                         if (!cart.isEmpty()) {
-                            totalTextView.setText("Total Price: €" + totalPrice);
+                            if(user.isStudent()) {
+                                totalTextView.setText("Total Price(including 20% discount for students): €" + totalPrice);
+                            }
+                            else {
+                                totalTextView.setText("Total Price: €" + totalPrice);
+                            }
                         } else {
                             totalTextView.setText("Cart is empty");
                         }

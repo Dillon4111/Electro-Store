@@ -1,7 +1,16 @@
 package com.example.electrostore.classes;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.electrostore.patterns.Strategy;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
 import java.util.List;
@@ -112,5 +121,30 @@ public class Product implements Serializable {
 
     public void setImages(List<String> images) {
         this.images = images;
+    }
+
+    public void buy(int count){
+        Log.d("Method", id + count);
+
+        final DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
+
+        productDB.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot productSnap : snapshot.getChildren()) {
+                    if (productSnap.getKey().equals(id)) {
+
+                        long stockLevel = (long) productSnap.child("stockLevel").getValue();
+                        stockLevel = stockLevel - count;
+                        productDB.child(productSnap.getKey()).child("stockLevel").setValue(stockLevel);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

@@ -18,6 +18,8 @@ import com.example.electrostore.R;
 import com.example.electrostore.classes.Order;
 import com.example.electrostore.classes.Product;
 import com.example.electrostore.classes.User;
+import com.example.electrostore.patterns.BuyStock;
+import com.example.electrostore.patterns.Invoker;
 import com.example.electrostore.utils.MainProductsAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -137,13 +139,22 @@ public class CartActivity extends AppCompatActivity {
                     int occurrences = Collections.frequency(productIDs, productID);
                     hashMap.put(productID, occurrences);
                 }
-
+                int count = 0;
                 Iterator it = hashMap.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry pair = (Map.Entry) it.next();
                     Log.d("HashMap", pair.getKey() + " = " + pair.getValue());
 
-                    reduceProductStock(pair.getKey().toString(), (Integer) pair.getValue());
+                    //reduceProductStock(pair.getKey().toString(), (Integer) pair.getValue());
+
+                    BuyStock buyStockOrder = new BuyStock(cart.get(count), (Integer) pair.getValue());
+
+                    Invoker invoker = new Invoker();
+                    invoker.takeOrder(buyStockOrder);
+
+                    invoker.placeOrders();
+
+                    count ++;
                 }
 
                 DatabaseReference orderDetails = FirebaseDatabase.getInstance().getReference("User_OrderHistory");
@@ -279,33 +290,4 @@ public class CartActivity extends AppCompatActivity {
             totalTextView.setText("Total Price: €" + totalPrice);
         }
     };
-
-    public void reduceProductStock(String id, int count) {
-        Log.d("Method", id + count);
-
-        final DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
-
-        productDB.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot productSnap : snapshot.getChildren()) {
-                    if (productSnap.getKey().equals(id)) {
-
-                        long stockLevel = (long) productSnap.child("stockLevel").getValue();
-                        stockLevel = stockLevel - count;
-                        productDB.child(productSnap.getKey()).child("stockLevel").setValue(stockLevel);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    public ArrayList<Product> getCart() {
-        return cart;
-    }
 }

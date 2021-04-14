@@ -318,18 +318,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             Toast.LENGTH_LONG).show();
                 }
                 break;
-//            case R.id.nav_search_movie:
-//                i = new Intent(MainActivity.this, SearchActivity.class);
-//                startActivity(i);
-//                break;
-            case R.id.nav_customer_details:
-                i = new Intent(MainActivity.this, CustomerDetailsActivity.class);
-                startActivity(i);
+            case R.id.nav_update_stock:
+                if (isAdmin) {
+                    i = new Intent(MainActivity.this, UpdateStockActivity.class);
+                    startActivity(i);
+                } else {
+                    Toast.makeText(MainActivity.this, "Admin needed for access",
+                            Toast.LENGTH_LONG).show();
+                }
                 break;
-//            case R.id.nav_settings:
-//                i = new Intent(MainActivity.this, SettingsActivity.class);
-//                startActivity(i);
-//                break;
+            case R.id.nav_customer_details:
+                if (isAdmin) {
+                    i = new Intent(MainActivity.this, CustomerDetailsActivity.class);
+                    startActivity(i);
+                } else {
+                    Toast.makeText(MainActivity.this, "Admin needed for access",
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
             case R.id.nav_log_out:
                 mAuth.signOut();
                 FirebaseAuth.getInstance().signOut();

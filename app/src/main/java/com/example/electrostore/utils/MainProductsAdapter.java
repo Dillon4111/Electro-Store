@@ -12,8 +12,10 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.electrostore.R;
+import com.example.electrostore.activities.EditProductActivity;
 import com.example.electrostore.activities.MyOrdersHistory;
 import com.example.electrostore.activities.ProductDetailsActivity;
+import com.example.electrostore.activities.UpdateStockActivity;
 import com.example.electrostore.classes.Product;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
@@ -77,6 +79,11 @@ public class MainProductsAdapter extends RecyclerView.Adapter<MainProductsAdapte
                 if(context.getClass() == MyOrdersHistory.class) {
                     intent.putExtra("PRODUCT_INTENT", product);
                     intent.putExtra("DETAILS_INTENT", "BOUGHT");
+                    context.startActivity(intent);
+                }
+                else if(context.getClass() == UpdateStockActivity.class) {
+                    intent = new Intent(context, EditProductActivity.class);
+                    intent.putExtra("PRODUCT_INTENT", product);
                     context.startActivity(intent);
                 }
                 else {

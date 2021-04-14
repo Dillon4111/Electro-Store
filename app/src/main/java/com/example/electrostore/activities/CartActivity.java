@@ -84,7 +84,7 @@ public class CartActivity extends AppCompatActivity {
 
                         for (Product p : cart) {
                             if(user.isStudent()) {
-                                totalPrice += p.calculateDiscount(p.getPrice(), 0.2);
+                                totalPrice += user.calculateDiscount(p.getPrice(), 0.2);
                             }
                             else {
                                 totalPrice += p.getPrice();

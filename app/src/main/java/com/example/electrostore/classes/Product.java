@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @IgnoreExtraProperties
-public class Product implements Serializable, Strategy {
+public class Product implements Serializable {
 
     private String id;
     private String name;
@@ -112,11 +112,5 @@ public class Product implements Serializable, Strategy {
 
     public void setImages(List<String> images) {
         this.images = images;
-    }
-
-    @Override
-    public double calculateDiscount(double price, double rate) {
-        double substraction = price * rate;
-        return this.price - substraction;
     }
 }

@@ -139,17 +139,19 @@ public class CartActivity extends AppCompatActivity {
                     int occurrences = Collections.frequency(productIDs, productID);
                     hashMap.put(productID, occurrences);
                 }
+
                 int count = 0;
+
                 Iterator it = hashMap.entrySet().iterator();
+
                 while (it.hasNext()) {
                     Map.Entry pair = (Map.Entry) it.next();
                     Log.d("HashMap", pair.getKey() + " = " + pair.getValue());
 
-                    //reduceProductStock(pair.getKey().toString(), (Integer) pair.getValue());
-
                     BuyStock buyStockOrder = new BuyStock(cart.get(count), (Integer) pair.getValue());
 
-                    Invoker invoker = new Invoker();
+                    Invoker invoker = Invoker.getInstance();
+                    
                     invoker.takeOrder(buyStockOrder);
 
                     invoker.placeOrders();

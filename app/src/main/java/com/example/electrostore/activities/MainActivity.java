@@ -46,14 +46,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
-    private EditText searchTitleEdit, searchCatEdit, searchManuEdit;
-    private Spinner sortSpinner;
     private List<String> sortSpinnerList = new ArrayList<>();
 
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
-
-    private DatabaseReference productsDB;
 
     private boolean isAdmin;
 
@@ -108,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
 
-        sortSpinner = findViewById(R.id.sortSpinner);
+        Spinner sortSpinner = findViewById(R.id.sortSpinner);
 
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortSpinner.setAdapter(categoryAdapter);
@@ -149,9 +145,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        searchTitleEdit = findViewById(R.id.nameSearch);
-        searchCatEdit = findViewById(R.id.categorySearch);
-        searchManuEdit = findViewById(R.id.manufactSearch);
+        EditText searchTitleEdit = findViewById(R.id.nameSearch);
+        EditText searchCatEdit = findViewById(R.id.categorySearch);
+        EditText searchManuEdit = findViewById(R.id.manufactSearch);
         sortSpinner = findViewById(R.id.sortSpinner);
 
         Toolbar toolbar = findViewById(R.id.main_toolbar);
@@ -173,12 +169,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle.syncState();
 
 
-        productsDB = FirebaseDatabase.getInstance().getReference("Products");
+        DatabaseReference productsDB = FirebaseDatabase.getInstance().getReference("Products");
         productsDB.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                int childCount = (int) snapshot.getChildrenCount();
-//                int count = 0;
                 for (DataSnapshot productSnapshot : snapshot.getChildren()) {
                     String name = productSnapshot.child("name").getValue().toString();
                     String price = productSnapshot.child("price").getValue().toString();
@@ -197,12 +191,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     long stock = (long) productSnapshot.child("stockLevel").getValue();
                     product.setStockLevel((int) stock);
                     myDataset.add(product);
-//
-//                    count++;
-//
-//                    if(count == childCount) {
-//                        break;
-//                    }
                 }
                 myRecyclerView.setLayoutManager(new LinearLayoutManager((MainActivity.this)));
                 myRecyclerView.setHasFixedSize(true);
@@ -292,7 +280,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
         }
         mAdapter.filteredList(products);
-        //mAdapter.notifyDataSetChanged();
     }
 
 

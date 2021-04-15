@@ -31,7 +31,6 @@ public class MyOrdersHistory extends AppCompatActivity {
     private ArrayList<Product> products = new ArrayList<>();
     private MainProductsAdapter mAdapter;
     RecyclerView orderRecyclerView;
-    private User user;
     private TextView emptyView;
 
     @Override

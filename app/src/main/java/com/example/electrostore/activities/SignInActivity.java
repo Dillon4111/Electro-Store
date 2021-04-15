@@ -31,10 +31,6 @@ public class SignInActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private EditText signInEmail, signInPassword;
-    private Button signInButton;
-    private TextView orSignInText;
-
-    private static final int PERMISSIONS_REQUEST = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,60 +46,49 @@ public class SignInActivity extends AppCompatActivity {
 
         signInEmail = findViewById(R.id.signInEmail);
         signInPassword = findViewById(R.id.signInPassword);
-        signInButton = findViewById(R.id.signInButton);
-        orSignInText = findViewById(R.id.orRegisterText);
+        Button signInButton = findViewById(R.id.signInButton);
+        TextView orSignInText = findViewById(R.id.orRegisterText);
 
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = signInEmail.getText().toString().trim();
-                String password = signInPassword.getText().toString();
+        signInButton.setOnClickListener(v -> {
+            String email = signInEmail.getText().toString().trim();
+            String password = signInPassword.getText().toString();
 
-                if (email.matches("") || password.matches("")) {
-                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(SignInActivity.this);
+            if (email.matches("") || password.matches("")) {
+                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(SignInActivity.this);
 
-                    dlgAlert.setMessage("Please fill in both fields");
-                    dlgAlert.setTitle("Hold up!");
-                    dlgAlert.setPositiveButton("OK", null);
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
+                dlgAlert.setMessage("Please fill in both fields");
+                dlgAlert.setTitle("Hold up!");
+                dlgAlert.setPositiveButton("OK", null);
+                dlgAlert.setCancelable(true);
+                dlgAlert.create().show();
 
-                    dlgAlert.setPositiveButton("Ok",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+                dlgAlert.setPositiveButton("Ok",
+                        (dialog, which) -> {
 
-                                }
-                            });
-                } else {
-                    mAuth.signInWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(SignInActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(SignInActivity.this, "User signed in",
-                                                Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(SignInActivity.this, task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(SignInActivity.this, "User signed in",
+                                        Toast.LENGTH_SHORT).show();
 
-                                                Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                                                startActivity(intent);
+                                        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                                        startActivity(intent);
 
-                                    } else {
-                                        Log.w("MySignin", "SignInUserWithEmail:failure", task.getException());
-                                        Toast.makeText(SignInActivity.this, "Authentication failed",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                }
+                            } else {
+                                Log.w("MySignin", "SignInUserWithEmail:failure", task.getException());
+                                Toast.makeText(SignInActivity.this, "Authentication failed",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
-        orSignInText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("OR REGISTER", "Link clicked");
-                Intent intent = new Intent(SignInActivity.this, RegistrationActivity.class);
-                startActivity(intent);
-            }
+        orSignInText.setOnClickListener(v -> {
+            Log.d("OR REGISTER", "Link clicked");
+            Intent intent = new Intent(SignInActivity.this, RegistrationActivity.class);
+            startActivity(intent);
         });
     }
 }

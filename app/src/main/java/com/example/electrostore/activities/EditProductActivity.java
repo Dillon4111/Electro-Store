@@ -39,7 +39,6 @@ public class EditProductActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private DatabaseReference db;
-    private TextView counter;
     private EditText editName, editPrice, editDescription, editCategory, editManufact, editStockLvl;
     FirebaseStorage storage;
     StorageReference storageReference;
@@ -72,72 +71,56 @@ public class EditProductActivity extends AppCompatActivity {
 
         Button addProductButton = findViewById(R.id.updateProductButton);
 
-        addProductButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                db = FirebaseDatabase.getInstance().getReference();
-                mAuth = FirebaseAuth.getInstance();
-                mUser = mAuth.getCurrentUser();
-                String uid = mUser.getUid();
-                String productName = editName.getText().toString();
-                String productPrice = editPrice.getText().toString();
-                double priceDouble = Double.parseDouble(productPrice);
-                String productDescription = editDescription.getText().toString();
-                String productManufact = editManufact.getText().toString();
-                String productCategory = editCategory.getText().toString();
-                int productStockLvl = Integer.parseInt(editStockLvl.getText().toString());
+        addProductButton.setOnClickListener(v -> {
+            db = FirebaseDatabase.getInstance().getReference();
+            mAuth = FirebaseAuth.getInstance();
+            mUser = mAuth.getCurrentUser();
+            String uid = mUser.getUid();
+            String productName = editName.getText().toString();
+            String productPrice = editPrice.getText().toString();
+            double priceDouble = Double.parseDouble(productPrice);
+            String productDescription = editDescription.getText().toString();
+            String productManufact = editManufact.getText().toString();
+            String productCategory = editCategory.getText().toString();
+            int productStockLvl = Integer.parseInt(editStockLvl.getText().toString());
 
-                if (productName.matches("") || productPrice.matches("") ||
-                        productDescription.matches("") || productManufact.matches("") ||
-                        editStockLvl.getText().toString().matches("")) {
+            if (productName.matches("") || productPrice.matches("") ||
+                    productDescription.matches("") || productManufact.matches("") ||
+                    editStockLvl.getText().toString().matches("")) {
 
-                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(EditProductActivity.this);
-                    dlgAlert.setMessage("Please fill in required fields(*)");
-                    dlgAlert.setTitle("Hold Up!");
-                    dlgAlert.setPositiveButton("OK", null);
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
-                    dlgAlert.setPositiveButton("Ok",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(EditProductActivity.this);
+                dlgAlert.setMessage("Please fill in required fields(*)");
+                dlgAlert.setTitle("Hold Up!");
+                dlgAlert.setPositiveButton("OK", null);
+                dlgAlert.setCancelable(true);
+                dlgAlert.create().show();
+                dlgAlert.setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
 
-                                }
-                            });
-                } else {
-                    String id = product.getId();
-                    double rating = product.getOverallRating();
-                    int totalRatings = product.getTotalRatings();
-                    List<String> images = product.getImages();
-                    product = new Product(productName, productCategory, productDescription, productManufact,
-                            priceDouble, productStockLvl, images);
-                    product.setTotalRatings(totalRatings);
-                    product.setOverallRating(rating);
-                    db.child("Products").child(id).setValue(product)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(EditProductActivity.this, "Product updated",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(EditProductActivity.this, "Write to db failed", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                }
+                            }
+                        });
+            } else {
+                String id = product.getId();
+                double rating = product.getOverallRating();
+                int totalRatings = product.getTotalRatings();
+                List<String> images = product.getImages();
+                product = new Product(productName, productCategory, productDescription, productManufact,
+                        priceDouble, productStockLvl, images);
+                product.setTotalRatings(totalRatings);
+                product.setOverallRating(rating);
+                db.child("Products").child(id).setValue(product)
+                        .addOnSuccessListener(aVoid -> Toast.makeText(EditProductActivity.this, "Product updated",
+                                Toast.LENGTH_LONG).show())
+                        .addOnFailureListener(e -> Toast.makeText(EditProductActivity.this, "Write to db failed", Toast.LENGTH_LONG).show());
             }
         });
 
         ImageButton backButton = findViewById(R.id.updateProductBackButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(EditProductActivity.this, UpdateStockActivity.class);
-                finish();
-                startActivity(i);
-            }
+        backButton.setOnClickListener(v -> {
+            Intent i1 = new Intent(EditProductActivity.this, UpdateStockActivity.class);
+            finish();
+            startActivity(i1);
         });
     }
 }

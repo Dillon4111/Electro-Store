@@ -36,9 +36,7 @@ public class ReviewProductActivity extends AppCompatActivity {
 
     private EditText editText;
     private RatingBar ratingBar;
-    private Button button;
     private TextView counter;
-    private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private User user;
     private Product product, newProduct;
@@ -49,7 +47,7 @@ public class ReviewProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review_product);
 
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
         final DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
@@ -72,7 +70,7 @@ public class ReviewProductActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.editReview);
         ratingBar = findViewById(R.id.rating);
-        button = findViewById(R.id.reviewButton);
+        Button button = findViewById(R.id.reviewButton);
         counter = findViewById(R.id.counter);
 
         Intent i = getIntent();
@@ -93,76 +91,69 @@ public class ReviewProductActivity extends AppCompatActivity {
         };
         editText.addTextChangedListener(mTextEditorWatcher);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newRating = ratingBar.getRating();
-                String description = editText.getText().toString();
+        button.setOnClickListener(v -> {
+            newRating = ratingBar.getRating();
+            String description = editText.getText().toString();
 
-                DatabaseReference reviewDB = FirebaseDatabase.getInstance().getReference("Product_Reviews");
-                reviewDB.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.hasChild(product.getId())) {
-//                            final DatabaseReference userDB = FirebaseDatabase.getInstance().getReference("Users");
-//
-//
-                            GenericTypeIndicator<ArrayList<Review>> t = new GenericTypeIndicator<ArrayList<Review>>() {
-                            };
-                            ArrayList<Review> reviews = snapshot.child(product.getId()).getValue(t);
-                            Review review = new Review(description, product.getId(), newRating, user.getName());
-                            reviews.add(review);
-                            reviewDB.child(product.getId()).setValue(reviews);
-                            Log.d("REVIEW", "TRUE");
+            DatabaseReference reviewDB = FirebaseDatabase.getInstance().getReference("Product_Reviews");
+            reviewDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.hasChild(product.getId())) {
+                        GenericTypeIndicator<ArrayList<Review>> t = new GenericTypeIndicator<ArrayList<Review>>() {
+                        };
+                        ArrayList<Review> reviews = snapshot.child(product.getId()).getValue(t);
+                        Review review = new Review(description, product.getId(), newRating, user.getName());
+                        reviews.add(review);
+                        reviewDB.child(product.getId()).setValue(reviews);
+                        Log.d("REVIEW", "TRUE");
 
-                        } else {
-                            Log.d("REVIEW", "FALSE");
-                            ArrayList<Review> reviews = new ArrayList<>();
-                            Review review = new Review(description, product.getId(), newRating, user.getName());
-                            reviews.add(review);
-                            reviewDB.child(product.getId()).setValue(reviews);
+                    } else {
+                        Log.d("REVIEW", "FALSE");
+                        ArrayList<Review> reviews = new ArrayList<>();
+                        Review review = new Review(description, product.getId(), newRating, user.getName());
+                        reviews.add(review);
+                        reviewDB.child(product.getId()).setValue(reviews);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            final DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
+
+            productDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot productSnap : snapshot.getChildren()) {
+                        if (productSnap.getKey().equals(product.getId())) {
+                            newProduct = productSnap.getValue(Product.class);
+
+                            break;
                         }
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    int ratings = newProduct.getTotalRatings();
+                    double rating = newProduct.getOverallRating();
+                    double finalRating = ((rating * ratings) + newRating) / (ratings + 1);
 
-                    }
-                });
+                    newProduct.setTotalRatings(ratings + 1);
+                    newProduct.setOverallRating(finalRating);
 
-                final DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
+                    DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
+                    productDB.child(product.getId()).setValue(newProduct);
 
-                productDB.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot productSnap : snapshot.getChildren()) {
-                            if (productSnap.getKey().equals(product.getId())) {
-                                newProduct = productSnap.getValue(Product.class);
+                    finish();
+                }
 
-                                break;
-                            }
-                        }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-                        int ratings = newProduct.getTotalRatings();
-                        //((Overall Rating * Total Rating) + new Rating) / (Total Rating + 1)
-                        double rating = newProduct.getOverallRating();
-                        double finalRating = ((rating * ratings) + newRating) / (ratings + 1);
-
-                        newProduct.setTotalRatings(ratings + 1);
-                        newProduct.setOverallRating(finalRating);
-
-                        DatabaseReference productDB = FirebaseDatabase.getInstance().getReference("Products");
-                        productDB.child(product.getId()).setValue(newProduct);
-
-                        finish();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
+                }
+            });
         });
     }
 }

@@ -94,92 +94,71 @@ public class AddProductActivity extends AppCompatActivity {
 
 
         Button chooseImagesButton = findViewById(R.id.chooseImagesButton);
-        chooseImagesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ActivityCompat.checkSelfPermission(AddProductActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        chooseImagesButton.setOnClickListener(v -> {
+            if (ActivityCompat.checkSelfPermission(AddProductActivity.this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                    ActivityCompat.requestPermissions(AddProductActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
-                    return;
-                }
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                intent.setType("image/*");
-                startActivityForResult(intent, 1);
-
+                ActivityCompat.requestPermissions(AddProductActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+                return;
             }
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.setType("image/*");
+            startActivityForResult(intent, 1);
+
         });
 
 
-        addProductButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                db = FirebaseDatabase.getInstance().getReference();
-                mAuth = FirebaseAuth.getInstance();
-                mUser = mAuth.getCurrentUser();
-                String uid = mUser.getUid();
-                String productName = editName.getText().toString();
-                String productPrice = editPrice.getText().toString();
-                double priceDouble = Double.parseDouble(productPrice);
-                String productDescription = editDescription.getText().toString();
-                String productManufact = editManufact.getText().toString();
-                String productCategory = editCategory.getText().toString();
-                int productStockLvl = Integer.parseInt(editStockLvl.getText().toString());
+        addProductButton.setOnClickListener(v -> {
+            db = FirebaseDatabase.getInstance().getReference();
+            mAuth = FirebaseAuth.getInstance();
+            mUser = mAuth.getCurrentUser();
+            String uid = mUser.getUid();
+            String productName = editName.getText().toString();
+            String productPrice = editPrice.getText().toString();
+            double priceDouble = Double.parseDouble(productPrice);
+            String productDescription = editDescription.getText().toString();
+            String productManufact = editManufact.getText().toString();
+            String productCategory = editCategory.getText().toString();
+            int productStockLvl = Integer.parseInt(editStockLvl.getText().toString());
 
-                if (productName.matches("") || productPrice.matches("") ||
-                productDescription.matches("") || productManufact.matches("") ||
-                editStockLvl.getText().toString().matches("")) {
+            if (productName.matches("") || productPrice.matches("") ||
+            productDescription.matches("") || productManufact.matches("") ||
+            editStockLvl.getText().toString().matches("")) {
 
-                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(AddProductActivity.this);
-                    dlgAlert.setMessage("Please fill in required fields(*)");
-                    dlgAlert.setTitle("Hold Up!");
-                    dlgAlert.setPositiveButton("OK", null);
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
-                    dlgAlert.setPositiveButton("Ok",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(AddProductActivity.this);
+                dlgAlert.setMessage("Please fill in required fields(*)");
+                dlgAlert.setTitle("Hold Up!");
+                dlgAlert.setPositiveButton("OK", null);
+                dlgAlert.setCancelable(true);
+                dlgAlert.create().show();
+                dlgAlert.setPositiveButton("Ok",
+                        (dialog, which) -> {
 
-                                }
-                            });
-                } else {
+                        });
+            } else {
 
-                    if (!uploadImages()) {
-                        Toast.makeText(AddProductActivity.this, "Cancelled, image upload error. Try again",
-                                Toast.LENGTH_LONG).show();
-                    }
-                    else {
-                        Product product = new Product(productName, productCategory, productDescription, productManufact,
-                                priceDouble, productStockLvl, images);
-                        db.child("Products").push().setValue(product)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(AddProductActivity.this, "Product added",
-                                                Toast.LENGTH_LONG).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(AddProductActivity.this, "Write to db failed", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                    }
+                if (!uploadImages()) {
+                    Toast.makeText(AddProductActivity.this, "Cancelled, image upload error. Try again",
+                            Toast.LENGTH_LONG).show();
+                }
+                else {
+                    Product product = new Product(productName, productCategory, productDescription, productManufact,
+                            priceDouble, productStockLvl, images);
+                    db.child("Products").push().setValue(product)
+                            .addOnSuccessListener(aVoid -> Toast.makeText(AddProductActivity.this, "Product added",
+                                    Toast.LENGTH_LONG).show())
+                            .addOnFailureListener(e -> Toast.makeText(AddProductActivity.this, "Write to db failed", Toast.LENGTH_LONG).show());
                 }
             }
         });
 
         ImageButton backButton = findViewById(R.id.addProductBackButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(AddProductActivity.this, MainActivity.class);
-                finish();
-                startActivity(i);
-            }
+        backButton.setOnClickListener(v -> {
+            Intent i = new Intent(AddProductActivity.this, MainActivity.class);
+            finish();
+            startActivity(i);
         });
     }
 
@@ -251,32 +230,24 @@ public class AddProductActivity extends AppCompatActivity {
                         = storageReference
                         .child("images/" + UUID.randomUUID().toString());
 
+                // Progress Listener for loading
+// percentage on the dialog box
                 ref.putFile(uri)
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                imageUploadSuccess = false;
-                                // Error, Image not uploaded
-                                Toast
-                                        .makeText(AddProductActivity.this,
-                                                "Failed " + e.getMessage(),
-                                                Toast.LENGTH_SHORT)
-                                        .show();
-                            }
+                        .addOnFailureListener(e -> {
+                            imageUploadSuccess = false;
+                            // Error, Image not uploaded
+                            Toast
+                                    .makeText(AddProductActivity.this,
+                                            "Failed " + e.getMessage(),
+                                            Toast.LENGTH_SHORT)
+                                    .show();
                         })
                         .addOnProgressListener(
-                                new OnProgressListener<UploadTask.TaskSnapshot>() {
-
-                                    // Progress Listener for loading
-                                    // percentage on the dialog box
-                                    @Override
-                                    public void onProgress(
-                                            UploadTask.TaskSnapshot taskSnapshot) {
-                                        double progress
-                                                = (100.0
-                                                * taskSnapshot.getBytesTransferred()
-                                                / taskSnapshot.getTotalByteCount());
-                                    }
+                                taskSnapshot -> {
+                                    double progress
+                                            = (100.0
+                                            * taskSnapshot.getBytesTransferred()
+                                            / taskSnapshot.getTotalByteCount());
                                 });
                 Log.i("REF PATH", ref.getPath());
                 images.add(ref.getPath());

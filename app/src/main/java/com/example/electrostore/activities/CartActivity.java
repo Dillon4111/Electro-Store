@@ -145,13 +145,13 @@ public class CartActivity extends AppCompatActivity {
                 Iterator it = hashMap.entrySet().iterator();
 
                 while (it.hasNext()) {
+
                     Map.Entry pair = (Map.Entry) it.next();
-                    Log.d("HashMap", pair.getKey() + " = " + pair.getValue());
 
                     BuyStock buyStockOrder = new BuyStock(cart.get(count), (Integer) pair.getValue());
 
                     Invoker invoker = Invoker.getInstance();
-                    
+
                     invoker.takeOrder(buyStockOrder);
 
                     invoker.placeOrders();

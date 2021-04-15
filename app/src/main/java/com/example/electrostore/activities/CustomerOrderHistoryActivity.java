@@ -62,10 +62,6 @@ public class CustomerOrderHistoryActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot userSnap : snapshot.getChildren()) {
                     if(userSnap.getKey().equals(user.getUid())) {
-//                        for (DataSnapshot snap: userSnap.getChildren()) {
-//                            Product product = snap.getValue(Product.class);
-//                            products.add(product);
-//                        }
                         GenericTypeIndicator<ArrayList<Order>> t = new GenericTypeIndicator<ArrayList<Order>>() {};
                         ArrayList<Order> orders = userSnap.getValue(t);
 

@@ -1,25 +1,16 @@
 package com.example.electrostore.utils;
 
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.electrostore.R;
-import com.example.electrostore.activities.CustomerDetailsActivity;
-import com.example.electrostore.activities.CustomerOrderHistoryActivity;
-import com.example.electrostore.activities.ProductDetailsActivity;
-import com.example.electrostore.classes.Product;
 import com.example.electrostore.classes.Review;
-import com.example.electrostore.classes.User;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;

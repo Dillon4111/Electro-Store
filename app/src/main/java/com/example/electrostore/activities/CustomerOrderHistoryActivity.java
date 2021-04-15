@@ -15,6 +15,7 @@ import com.example.electrostore.R;
 import com.example.electrostore.classes.Order;
 import com.example.electrostore.classes.Product;
 import com.example.electrostore.classes.User;
+import com.example.electrostore.patterns.ProductCache;
 import com.example.electrostore.utils.CustomerDetailsAdapter;
 import com.example.electrostore.utils.MainProductsAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,6 +43,8 @@ public class CustomerOrderHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_order_history);
 
+        ProductCache.loadCache();
+
         Intent i = getIntent();
         user = (User) i.getSerializableExtra("USER_INTENT");
         Log.d("USER INTENT", user.getUid());
@@ -68,8 +71,11 @@ public class CustomerOrderHistoryActivity extends AppCompatActivity {
                         Log.d("TEST", "12234");
 
                         for(Order o: orders) {
-                            Log.d("ORDER", o.getUserID());
-                            products.addAll(o.getProducts());
+                            for(Product p: o.getProducts()) {
+
+                                products.add(ProductCache.getProduct(p.getId()));
+
+                            }
                         }
                         break;
                     }

@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @IgnoreExtraProperties
-public class Product implements Serializable {
+public class Product implements Serializable, Cloneable {
 
     private String id;
     private String name;
@@ -145,5 +145,18 @@ public class Product implements Serializable {
 
             }
         });
+    }
+
+    public Object clone() {
+        Object clone = null;
+
+        try {
+            clone = super.clone();
+
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        return clone;
     }
 }

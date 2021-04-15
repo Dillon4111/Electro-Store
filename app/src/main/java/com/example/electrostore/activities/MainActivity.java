@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseUser mUser;
 
     private boolean isAdmin;
-
     private ArrayList<Product> myDataset = new ArrayList<Product>();
     private MainProductsAdapter mAdapter;
     RecyclerView myRecyclerView;

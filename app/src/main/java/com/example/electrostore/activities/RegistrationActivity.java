@@ -1,27 +1,19 @@
 package com.example.electrostore.activities;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.electrostore.R;
 import com.example.electrostore.classes.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -106,15 +98,12 @@ public class RegistrationActivity extends AppCompatActivity {
                                 User user = new User(userName, email, address, student);
                                 String uid = mUser.getUid();
                                 db.child("Users").child(uid).setValue(user)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Toast.makeText(RegistrationActivity.this, "Registration is successful",
-                                                        Toast.LENGTH_LONG).show();
-                                                Intent intent = new Intent(RegistrationActivity.this, SignInActivity.class);
-                                                startActivity(intent);
-                                                finish();
-                                            }
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(RegistrationActivity.this, "Registration is successful",
+                                                    Toast.LENGTH_LONG).show();
+                                            Intent intent = new Intent(RegistrationActivity.this, SignInActivity.class);
+                                            startActivity(intent);
+                                            finish();
                                         })
                                         .addOnFailureListener(e -> Toast.makeText(RegistrationActivity.this, "Write to db failed", Toast.LENGTH_LONG).show());
                             } else {
